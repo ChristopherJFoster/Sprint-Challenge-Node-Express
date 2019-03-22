@@ -1,6 +1,7 @@
 const router = require('express').Router();
 
 const actionModel = require('../helpers/actionModel');
+const projectModel = require('../helpers/projectModel');
 
 router.get('/', async (req, res) => {
   try {
@@ -25,22 +26,41 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// router.post('/', async (req, res) => {
-//   if (req.body.name && req.body.description) {
-//     try {
-//       const addedaction = await actionModel.insert(req.body);
-//       res.status(201).json(addedaction);
-//     } catch (err) {
-//       res.status(500).json({
-//         error: 'There was an error while saving the action to the database.'
-//       });
-//     }
-//   } else {
-//     res.status(400).json({
-//       error: 'Please provide both a name and description for the action.'
-//     });
-//   }
-// });
+router.post('/:id', async (req, res) => {
+  // First check if the project ID exists:
+  try {
+    project = await projectModel.get(req.params.id);
+  } catch (err) {
+    res.status(404).json({
+      error:
+        'There is no project with that ID, or there was an error checking the project ID.'
+    });
+  }
+  // Then check if the action submission requirements are met:
+  if (!req.body.description || !req.body.notes) {
+    res.status(400).json({
+      error: 'Please provide both a description and notes for the action.'
+    });
+  } else if (req.body.description.length > 128) {
+    res.status(400).json({
+      error:
+        'Your action description is limited to 128 characters. Please use the notes field for additional information.'
+    });
+  }
+  // Then submit the new action:
+  try {
+    const addedAction = await actionModel.insert({
+      project_id: req.params.id,
+      description: req.body.description,
+      notes: req.body.notes
+    });
+    res.status(201).json(addedAction);
+  } catch (err) {
+    res.status(500).json({
+      error: 'There was an error while saving the action to the database.'
+    });
+  }
+});
 
 // router.put('/:id', async (req, res) => {
 //   if (!req.params.id || !req.body.changes) {
