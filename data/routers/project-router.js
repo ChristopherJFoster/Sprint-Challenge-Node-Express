@@ -25,25 +25,22 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// router.post('/', (req, res) => {
-//   if (req.body.name) {
-//     projectModel
-//       .insert(req.body)
-//       .then(user => {
-//         res.status(201).json(user);
-//       })
-//       .catch(err => {
-//         res.status(500).json({
-//           error:
-//             'There was an error while saving the user to the database. Try submitting a different name.'
-//         });
-//       });
-//   } else {
-//     res.status(400).json({
-//       error: 'Please provide a name for the user.'
-//     });
-//   }
-// });
+router.post('/', async (req, res) => {
+  if (req.body.name && req.body.description) {
+    try {
+      let project = await projectModel.insert(req.body);
+      res.status(201).json(project);
+    } catch (err) {
+      res.status(500).json({
+        error: 'There was an error while saving the project to the database.'
+      });
+    }
+  } else {
+    res.status(400).json({
+      error: 'Please provide both a name and description for the project.'
+    });
+  }
+});
 
 // router.delete('/:id', (req, res) => {
 //   projectModel
