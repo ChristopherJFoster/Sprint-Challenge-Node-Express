@@ -95,23 +95,23 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// router.delete('/:id', async (req, res) => {
-//   try {
-//     const numOfRemovedactions = await actionModel.remove(req.params.id);
-//     if (numOfRemovedactions) {
-//       res.status(200).json({
-//         message: `Number of actions deleted: ${numOfRemovedactions}`
-//       });
-//     } else {
-//       res
-//         .status(404)
-//         .json({ error: 'The action with the specified ID does not exist.' });
-//     }
-//   } catch (err) {
-//     res.status(500).json({
-//       error: 'There was an error while removing the action from the database.'
-//     });
-//   }
-// });
+router.delete('/:id', async (req, res) => {
+  try {
+    const numOfRemovedActions = await actionModel.remove(req.params.id);
+    if (numOfRemovedActions) {
+      res.status(200).json({
+        message: `Number of actions deleted: ${numOfRemovedActions}`
+      });
+    } else {
+      res
+        .status(404)
+        .json({ error: 'The action with the specified ID does not exist.' });
+    }
+  } catch (err) {
+    res.status(500).json({
+      error: 'There was an error while removing the action from the database.'
+    });
+  }
+});
 
 module.exports = router;
