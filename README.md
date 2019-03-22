@@ -24,15 +24,39 @@ In this challenge, create a web API around the following resources: `Projects` a
 
 Demonstrate your understanding of this Sprint's concepts by answering the following free-form questions. Edit this document to include your answers after each question. Make sure to leave a blank line above and below your answer so it is clear and easy to read by your project manager.
 
-- [ ] Mention two parts of Express that you learned about this week.
+- [ ] Describe two parts of Express that you learned about this week.
 
-- [ ] Describe Middleware?
+  **Server-side routing**: Express enables easy server-side routing, so developers can organize their servers according to different resources, such as users and the posts made by users. A route like api/users will accept all the server commands that deal with users, while a route like api/posts will deal with posts.
 
-- [ ] Describe a Resource?
+  **Abstraction**: Express abstracts away the verbose JavaScript server commands such as GET, POST, DELETE, and PUT. The result is code that is more readable and thus easier to debug.
+
+- [ ] Describe Middleware.
+
+  Express enables easy use of middleware, with capabilities such as authentication, security, data massaging (like capitalization), and many others. Developers may plug in highly-polished and well-vetted code written by others, or they can write their own. Middleware allows for a modular pipeline of data processing.
+
+- [ ] Describe a Resource.
+
+  A server may manage a large dataset that includes data of varying types. That dataset can be divided into manageable parts, and each of these divisions can be called a resource. While there may be many ways a particular dataset could be divided, some methods present themselves as “natural” and are perhaps easier to understand and manage for human (who, after all, are (for now) the ones writing the server code). One method is to describe a person using the app in question, and then take all the **nouns** from the description and consider those to be app’s resources:
+
+  Book Review App: A **user** creates an **account**. A user can then write a **bio** about themselves, write **reviews** about **books**, and write blog **posts** about their favorite **authors**. A user can also make **connections** with other users.
+
+  While each of the bolded nouns may not end up requiring its own database, this exercise has given us a pretty good idea of the kinds of data resources the backend of our app will need to store, and how that data might best be organized.
 
 - [ ] What can the API return to help clients know if a request was successful?
 
+  **1**. Status codes: Sending the proper status code, such as 201 for ‘created’, or 400 for ‘bad request’, gives the client a pretty good clue about whether the request was successful, and if not, why not.
+  **2**. Messages: More specific success or error messages can be sent along with a status code. Along with status code 201, we might send a “New user created.” success message. Along with status code 400, we might send a “Please provide an item description.” error message.
+  **3**. Data: We might also send data with a status code—particularly a success code. For example, we might send a copy of a record that was successfully deleted.
+
 - [ ] How can we partition our application into sub-applications?
+
+  **Resources**: The databases for each resource (users, posts, photos) can each be stored in their own database.
+
+  **Routing**: Routing allows us to direct all server calls to a specific resource to the same URL. This division naturally suggests putting all such calls into a dedicated file. Other such dedicated files can be created for the server calls to other resources.
+
+  **Middleware**: Middleware can be imported (required) or stored in a separate folder, and then, using Express, can be plugged into the data pipeline as needed.
+
+  **Helpers**: Helper functions (in this context) are functions that stand between server calls (see Routing) and resources (see Resources). They can perhaps be thought of as “custom abstraction” code: helper functions feature logic and conversion code for dealing with resources. That code is thus kept out of the server calls, keeping the code for the calls themselves a bit cleaner.
 
 ## Project Setup
 
