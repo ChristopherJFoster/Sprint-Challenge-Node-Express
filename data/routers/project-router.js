@@ -4,7 +4,7 @@ const projectModel = require('../helpers/projectModel');
 
 router.get('/', async (req, res) => {
   try {
-    let projects = await projectModel.get();
+    const projects = await projectModel.get();
     res.status(200).json(projects);
   } catch (err) {
     res
@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   try {
-    let project = await projectModel.get(req.params.id);
+    const project = await projectModel.get(req.params.id);
     res.status(200).json(project);
   } catch (err) {
     res.status(404).json({
@@ -28,8 +28,8 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   if (req.body.name && req.body.description) {
     try {
-      let project = await projectModel.insert(req.body);
-      res.status(201).json(project);
+      const addedProject = await projectModel.insert(req.body);
+      res.status(201).json(addedProject);
     } catch (err) {
       res.status(500).json({
         error: 'There was an error while saving the project to the database.'
@@ -41,6 +41,55 @@ router.post('/', async (req, res) => {
     });
   }
 });
+
+router.put('/:id', async (req, res) => {
+  if (!req.params.id || !req.body.changes) {
+    res.status(400).json({
+      error:
+        'Please provide the ID of the project you intend to update as well as your intended changes.'
+    });
+  } else {
+    try {
+      const updatedProject = await projectModel.update(
+        req.params.id,
+        req.body.changes
+      );
+      if (updatedProject) {
+        res
+          .status(200)
+          .json({ message: 'You successfully updated the project.' });
+      } else {
+        res.status(404).json({
+          message: 'The project with the specified ID does not exist.'
+        });
+      }
+    } catch (err) {
+      res.status(500).json({
+        error: 'There was an error while updating the project.'
+      });
+    }
+  }
+});
+
+//   projectModel
+//     .update(req.body.id, req.body.changes)
+//     .then(user => {
+//       if (user) {
+//         res
+//           .status(200)
+//           .json({ message: 'You successfully updated the user.' });
+//       } else {
+//         res.status(404).json({
+//           message: 'The user with the specified ID does not exist.'
+//         });
+//       }
+//     })
+//     .catch(err => {
+//       res
+//         .status(500)
+//         .json({ error: 'The user information could not be updated.' });
+//     });
+// }
 
 // router.delete('/:id', (req, res) => {
 //   projectModel
@@ -59,34 +108,6 @@ router.post('/', async (req, res) => {
 //     .catch(err => {
 //       res.status(500).json({ error: 'The user could not be removed' });
 //     });
-// });
-
-// router.put('/', (req, res) => {
-//   if (!req.body.id || !req.body.changes) {
-//     res.status(400).json({
-//       error:
-//         'Please provide the ID of the user you intend to update as well as your intended changes.'
-//     });
-//   } else {
-//     projectModel
-//       .update(req.body.id, req.body.changes)
-//       .then(user => {
-//         if (user) {
-//           res
-//             .status(200)
-//             .json({ message: 'You successfully updated the user.' });
-//         } else {
-//           res.status(404).json({
-//             message: 'The user with the specified ID does not exist.'
-//           });
-//         }
-//       })
-//       .catch(err => {
-//         res
-//           .status(500)
-//           .json({ error: 'The user information could not be updated.' });
-//       });
-//   }
 // });
 
 module.exports = router;
