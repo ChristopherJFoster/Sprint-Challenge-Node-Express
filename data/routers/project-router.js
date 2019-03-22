@@ -20,7 +20,7 @@ router.get('/:id', async (req, res) => {
   } catch (err) {
     res.status(404).json({
       error:
-        'There is no project with that ID, or the project information could not be retrieved.'
+        'There is no project with that ID, or there was an error retrieving the project information.'
     });
   }
 });
@@ -75,23 +75,38 @@ router.delete('/:id', async (req, res) => {
   try {
     const numOfRemovedProjects = await projectModel.remove(req.params.id);
     if (numOfRemovedProjects) {
-      res
-        .status(200)
-        .json({
-          message: `Number of projects deleted: ${numOfRemovedProjects}`
-        });
+      res.status(200).json({
+        message: `Number of projects deleted: ${numOfRemovedProjects}`
+      });
     } else {
       res
         .status(404)
         .json({ error: 'The project with the specified ID does not exist.' });
     }
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        error:
-          'There was an error while removing the project from the database.'
+    res.status(500).json({
+      error: 'There was an error while removing the project from the database.'
+    });
+  }
+});
+
+router.get('/:id/actions', async (req, res) => {
+  try {
+    const projectActions = await projectModel.getProjectActions(req.params.id);
+    if (projectActions.length > 0) {
+      res.status(200).json(projectActions);
+    } else {
+      // Since we aren't supposed to edit the helpers (I assume), I think this is a good compromise for not knowing whether there is no project with the submitted ID, or whether project has no actions:
+      res.status(404).json({
+        projectActions: projectActions,
+        message:
+          'Either there is no project with that ID, or the project has no actions.'
       });
+    }
+  } catch (err) {
+    res.status(500).json({
+      error: "There was an error retrieving the project's actions."
+    });
   }
 });
 
