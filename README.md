@@ -38,7 +38,7 @@ Demonstrate your understanding of this Sprint's concepts by answering the follow
 
   A server may manage a large dataset that includes data of varying types. That dataset can be divided into manageable parts, and each of these divisions can be called a resource. While there may be many ways a particular dataset could be divided, some methods present themselves as “natural” and are perhaps easier to understand and manage for human (who, after all, are (for now) the ones writing the server code). One method is to describe a person using the app in question, and then take all the **nouns** from the description and consider those to be app’s resources:
 
-  Book Review App: A **user** creates an **account**. A user can then write a **bio** about themselves, write **book** **reviews**, and write blog **posts** about their favorite **authors**. A user can also make **connections** with other users.
+  Book Review App: A **user** creates an **account**. A user can then write a **bio** about themselves, write **reviews** about **books**, and write blog **posts** about their favorite **authors**. A user can also make **connections** with other users.
 
   While each of the bolded nouns may not end up requiring its own database, this exercise has given us a pretty good idea of the kinds of data resources the backend of our app will need to store, and how that data might best be organized.
 
