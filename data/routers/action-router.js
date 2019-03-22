@@ -62,34 +62,38 @@ router.post('/:id', async (req, res) => {
   }
 });
 
-// router.put('/:id', async (req, res) => {
-//   if (!req.params.id || !req.body.changes) {
-//     res.status(400).json({
-//       error:
-//         'Please provide the ID of the action you intend to update as well as your intended changes.'
-//     });
-//   } else {
-//     try {
-//       const updatedaction = await actionModel.update(
-//         req.params.id,
-//         req.body.changes
-//       );
-//       if (updatedaction) {
-//         res
-//           .status(200)
-//           .json({ message: 'You successfully updated the action.' });
-//       } else {
-//         res.status(404).json({
-//           message: 'The action with the specified ID does not exist.'
-//         });
-//       }
-//     } catch (err) {
-//       res.status(500).json({
-//         error: 'There was an error while updating the action.'
-//       });
-//     }
-//   }
-// });
+router.put('/:id', async (req, res) => {
+  if (!req.params.id || !req.body.changes) {
+    res.status(400).json({
+      error:
+        'Please provide the ID of the action you intend to update as well as your intended changes.'
+    });
+  } else if (req.body.changes.description) {
+    if (req.body.changes.description.length > 128) {
+      res.status(400).json({
+        error:
+          'Your action description is limited to 128 characters. Please use the notes field for additional information.'
+      });
+    }
+  }
+  try {
+    const updatedAction = await actionModel.update(
+      req.params.id,
+      req.body.changes
+    );
+    if (updatedAction) {
+      res.status(200).json({ message: 'You successfully updated the action.' });
+    } else {
+      res.status(404).json({
+        message: 'The action with the specified ID does not exist.'
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      error: 'There was an error while updating the action.'
+    });
+  }
+});
 
 // router.delete('/:id', async (req, res) => {
 //   try {
