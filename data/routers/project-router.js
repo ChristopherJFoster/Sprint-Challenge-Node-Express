@@ -31,7 +31,8 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  if (req.body.name && req.body.description) {
+  const { name, description } = req.body;
+  if (name && description) {
     try {
       const addedProject = await projectModel.insert(req.body);
       res.status(201).json(addedProject);
@@ -48,21 +49,16 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-  if (!req.params.id || !req.body.changes) {
+  const { name, description, completed } = req.body;
+  if (!name && !description && !completed) {
     res.status(400).json({
-      error:
-        'Please provide the ID of the project you intend to update as well as your intended changes.'
+      error: 'Please provide the project changes you intend to make.'
     });
   } else {
     try {
-      const updatedProject = await projectModel.update(
-        req.params.id,
-        req.body.changes
-      );
+      const updatedProject = await projectModel.update(req.params.id, req.body);
       if (updatedProject) {
-        res
-          .status(200)
-          .json({ message: 'You successfully updated the project.' });
+        res.status(200).json(updatedProject);
       } else {
         res.status(404).json({
           message: 'The project with the specified ID does not exist.'
