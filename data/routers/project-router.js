@@ -77,12 +77,12 @@ router.delete('/:id', async (req, res) => {
     const numOfRemovedProjects = await projectModel.remove(req.params.id);
     if (numOfRemovedProjects) {
       res.status(200).json({
-        message: `Number of projects deleted: ${numOfRemovedProjects}`
+        message: `Number of projects deleted: ${numOfRemovedProjects}.`
       });
     } else {
-      res
-        .status(404)
-        .json({ error: 'The project with the specified ID does not exist.' });
+      res.status(404).json({
+        error: `The project with the specified ID does not exist. Number of projects deleted: ${numOfRemovedProjects}.`
+      });
     }
   } catch (err) {
     res.status(500).json({
