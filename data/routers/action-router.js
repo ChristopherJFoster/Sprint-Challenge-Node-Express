@@ -49,7 +49,7 @@ router.post('/', async (req, res) => {
     res.status(400).json({
       error: 'Please provide both a description and notes for the action.'
     });
-  } else if (req.body.description.length > 128) {
+  } else if (description.length > 128) {
     res.status(400).json({
       error:
         'The action description field is limited to 128 characters. Please use the action notes field to add additional information.'
@@ -67,35 +67,51 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-  if (!req.params.id || !req.body.changes) {
+  const { project_id, description, notes } = req.body;
+  // Make the first submission check before making a server call:
+  if (!project_id && !description && !notes) {
+    res.status(400).json({
+      error: 'Please provide the action changes you intend to make.'
+    });
+    // Make the second submission check before making a server call:
+  } else if (description && description.length > 128) {
     res.status(400).json({
       error:
-        'Please provide the ID of the action you intend to update as well as your intended changes.'
+        'The action description field is limited to 128 characters. Please use the action notes field to add additional information.'
     });
-  } else if (req.body.changes.description) {
-    if (req.body.changes.description.length > 128) {
-      res.status(400).json({
-        error:
-          'Your action description is limited to 128 characters. Please use the notes field for additional information.'
+  } else {
+    // If the first two submission checks pass, make the next submission check (this one requires a server call):
+    if (project_id) {
+      try {
+        const project = await projectModel.get(project_id);
+        if (!project) {
+          // The cleanest way I could think of to cover this check was to add a return here...:
+          return res.status(400).json({
+            error: 'There is no project with the specified ID.'
+          });
+        }
+      } catch (err) {
+        // ...and here:
+        return res.status(500).json({
+          error: `There was an error while checking the project ID. ${err}`
+        });
+      }
+    }
+    // If the submission passes the gauntlet above, then we attempt to update the action record:
+    try {
+      const updatedAction = await actionModel.update(req.params.id, req.body);
+      if (updatedAction) {
+        res.status(200).json(updatedAction);
+      } else {
+        res.status(404).json({
+          message: 'There is no action with the specified ID.'
+        });
+      }
+    } catch (err) {
+      res.status(500).json({
+        error: `There was an error while updating the action. ${err}`
       });
     }
-  }
-  try {
-    const updatedAction = await actionModel.update(
-      req.params.id,
-      req.body.changes
-    );
-    if (updatedAction) {
-      res.status(200).json({ message: 'You successfully updated the action.' });
-    } else {
-      res.status(404).json({
-        message: 'The action with the specified ID does not exist.'
-      });
-    }
-  } catch (err) {
-    res.status(500).json({
-      error: 'There was an error while updating the action.'
-    });
   }
 });
 
