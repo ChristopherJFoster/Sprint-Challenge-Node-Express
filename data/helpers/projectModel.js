@@ -12,12 +12,14 @@ module.exports = {
 
       return Promise.all(promises).then(function(results) {
         let [project, actions] = results;
+        if (!project) {
+          return null;
+        }
         project.actions = actions;
 
         return mappers.projectToBody(project);
       });
     }
-
     return query.then(projects => {
       return projects.map(project => mappers.projectToBody(project));
     });

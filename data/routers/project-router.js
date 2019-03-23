@@ -16,11 +16,16 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const project = await projectModel.get(req.params.id);
-    res.status(200).json(project);
+    if (project) {
+      res.status(200).json(project);
+    } else {
+      res.status(404).json({
+        error: 'There is no project with that ID.'
+      });
+    }
   } catch (err) {
-    res.status(404).json({
-      error:
-        'There is no project with that ID, or there was an error retrieving the project information.'
+    res.status(500).json({
+      error: 'There was an error retrieving the project information.'
     });
   }
 });
