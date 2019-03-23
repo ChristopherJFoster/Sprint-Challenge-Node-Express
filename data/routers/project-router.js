@@ -7,9 +7,9 @@ router.get('/', async (req, res) => {
     const projects = await projectModel.get();
     res.status(200).json(projects);
   } catch (err) {
-    res
-      .status(500)
-      .json({ error: 'The projects information could not be retrieved.' });
+    res.status(500).json({
+      error: 'There was an error while retrieving the projects information.'
+    });
   }
 });
 
@@ -20,12 +20,12 @@ router.get('/:id', async (req, res) => {
       res.status(200).json(project);
     } else {
       res.status(404).json({
-        error: 'There is no project with that ID.'
+        error: 'The project with the specified ID does not exist.'
       });
     }
   } catch (err) {
     res.status(500).json({
-      error: 'There was an error retrieving the project information.'
+      error: 'There was an error while retrieving the project information.'
     });
   }
 });
@@ -38,7 +38,7 @@ router.post('/', async (req, res) => {
       res.status(201).json(addedProject);
     } catch (err) {
       res.status(500).json({
-        error: 'There was an error while saving the project to the database.'
+        error: 'There was an error while saving the project.'
       });
     }
   } else {
@@ -86,27 +86,27 @@ router.delete('/:id', async (req, res) => {
     }
   } catch (err) {
     res.status(500).json({
-      error: 'There was an error while removing the project from the database.'
+      error: 'There was an error while deleting the project.'
     });
   }
 });
 
 router.get('/:id/actions', async (req, res) => {
-  try {
-    const projectActions = await projectModel.getProjectActions(req.params.id);
-    if (projectActions.length > 0) {
+  const project = await projectModel.get(req.params.id);
+  if (project) {
+    try {
+      const projectActions = await projectModel.getProjectActions(
+        req.params.id
+      );
       res.status(200).json(projectActions);
-    } else {
-      // Since we aren't supposed to edit the helpers (I assume), I think this is a good compromise for not knowing whether there is no project with the submitted ID, or whether project has no actions:
-      res.status(404).json({
-        projectActions: projectActions,
-        message:
-          'Either there is no project with that ID, or the project has no actions.'
+    } catch (err) {
+      res.status(500).json({
+        error: "There was an error while retrieving the project's actions."
       });
     }
-  } catch (err) {
-    res.status(500).json({
-      error: "There was an error retrieving the project's actions."
+  } else {
+    res.status(404).json({
+      error: 'The project with the specified ID does not exist.'
     });
   }
 });
