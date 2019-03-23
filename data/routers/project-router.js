@@ -8,7 +8,7 @@ router.get('/', async (req, res) => {
     res.status(200).json(projects);
   } catch (err) {
     res.status(500).json({
-      error: `There was an error while retrieving the projects information. ${err}`
+      error: `There was an error while retrieving the projects. ${err}`
     });
   }
 });
@@ -25,7 +25,7 @@ router.get('/:id', async (req, res) => {
     }
   } catch (err) {
     res.status(500).json({
-      error: `There was an error while retrieving the project information. ${err}`
+      error: `There was an error while retrieving the project. ${err}`
     });
   }
 });
@@ -38,7 +38,7 @@ router.post('/', async (req, res) => {
       res.status(201).json(addedProject);
     } catch (err) {
       res.status(500).json({
-        error: `There was an error while saving the project information. ${err}`
+        error: `There was an error while saving the project. ${err}`
       });
     }
   } else {

@@ -9,7 +9,7 @@ router.get('/', async (req, res) => {
     res.status(200).json(actions);
   } catch (err) {
     res.status(500).json({
-      error: `There was an error while retrieving the actions information. ${err}`
+      error: `There was an error while retrieving the actions. ${err}`
     });
   }
 });
@@ -26,44 +26,43 @@ router.get('/:id', async (req, res) => {
     }
   } catch (err) {
     res.status(500).json({
-      error: `There was an error while retrieving the action information. ${err}`
+      error: `There was an error while retrieving the action. ${err}`
     });
   }
 });
 
-router.post('/:id', async (req, res) => {
-  // First check if the project ID exists:
+router.post('/', async (req, res) => {
+  const { project_id, description, notes } = req.body;
   try {
-    project = await projectModel.get(req.params.id);
+    project = await projectModel.get(project_id);
+    if (!project) {
+      res.status(404).json({
+        error: 'There is no project with the specified ID.'
+      });
+    }
   } catch (err) {
-    res.status(404).json({
-      error:
-        'There is no project with that ID, or there was an error checking the project ID.'
+    res.status(500).json({
+      error: `There was an error while checking the project ID. ${err}`
     });
   }
-  // Then check if the action submission requirements are met:
-  if (!req.body.description || !req.body.notes) {
+  if (!description || !notes) {
     res.status(400).json({
       error: 'Please provide both a description and notes for the action.'
     });
   } else if (req.body.description.length > 128) {
     res.status(400).json({
       error:
-        'Your action description is limited to 128 characters. Please use the notes field for additional information.'
+        'The action description field is limited to 128 characters. Please use the action notes field to add additional information.'
     });
-  }
-  // Then submit the new action:
-  try {
-    const addedAction = await actionModel.insert({
-      project_id: req.params.id,
-      description: req.body.description,
-      notes: req.body.notes
-    });
-    res.status(201).json(addedAction);
-  } catch (err) {
-    res.status(500).json({
-      error: 'There was an error while saving the action to the database.'
-    });
+  } else {
+    try {
+      const addedAction = await actionModel.insert(req.body);
+      res.status(201).json(addedAction);
+    } catch (err) {
+      res.status(500).json({
+        error: `There was an error while saving the action. ${err}`
+      });
+    }
   }
 });
 
