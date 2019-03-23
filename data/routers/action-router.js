@@ -101,19 +101,19 @@ router.put('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
   try {
-    const numOfRemovedActions = await actionModel.remove(req.params.id);
-    if (numOfRemovedActions) {
+    const numOfDeletedActions = await actionModel.remove(req.params.id);
+    if (numOfDeletedActions) {
       res.status(200).json({
-        message: `Number of actions deleted: ${numOfRemovedActions}`
+        message: `Number of actions deleted: ${numOfDeletedActions}`
       });
     } else {
-      res
-        .status(404)
-        .json({ error: 'The action with the specified ID does not exist.' });
+      res.status(404).json({
+        error: `There is no action with the specified ID. Number of actions deleted: ${numOfDeletedActions}.`
+      });
     }
   } catch (err) {
     res.status(500).json({
-      error: 'There was an error while removing the action from the database.'
+      error: `There was an error while deleting the action. ${err}`
     });
   }
 });
