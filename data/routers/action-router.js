@@ -8,20 +8,25 @@ router.get('/', async (req, res) => {
     const actions = await actionModel.get();
     res.status(200).json(actions);
   } catch (err) {
-    res
-      .status(500)
-      .json({ error: 'The actions information could not be retrieved.' });
+    res.status(500).json({
+      error: `There was an error while retrieving the actions information. ${err}`
+    });
   }
 });
 
 router.get('/:id', async (req, res) => {
   try {
     const action = await actionModel.get(req.params.id);
-    res.status(200).json(action);
+    if (action) {
+      res.status(200).json(action);
+    } else {
+      res.status(404).json({
+        error: 'There is no action with the specified ID.'
+      });
+    }
   } catch (err) {
-    res.status(404).json({
-      error:
-        'There is no action with that ID, or there was an error retrieving the action information.'
+    res.status(500).json({
+      error: `There was an error while retrieving the action information. ${err}`
     });
   }
 });

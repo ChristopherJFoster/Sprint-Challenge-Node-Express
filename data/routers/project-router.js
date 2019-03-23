@@ -8,7 +8,7 @@ router.get('/', async (req, res) => {
     res.status(200).json(projects);
   } catch (err) {
     res.status(500).json({
-      error: 'There was an error while retrieving the projects information.'
+      error: `There was an error while retrieving the projects information. ${err}`
     });
   }
 });
@@ -20,12 +20,12 @@ router.get('/:id', async (req, res) => {
       res.status(200).json(project);
     } else {
       res.status(404).json({
-        error: 'The project with the specified ID does not exist.'
+        error: 'There is no project with the specified ID.'
       });
     }
   } catch (err) {
     res.status(500).json({
-      error: 'There was an error while retrieving the project information.'
+      error: `There was an error while retrieving the project information. ${err}`
     });
   }
 });
@@ -38,7 +38,7 @@ router.post('/', async (req, res) => {
       res.status(201).json(addedProject);
     } catch (err) {
       res.status(500).json({
-        error: 'There was an error while saving the project.'
+        error: `There was an error while saving the project information. ${err}`
       });
     }
   } else {
@@ -61,12 +61,12 @@ router.put('/:id', async (req, res) => {
         res.status(200).json(updatedProject);
       } else {
         res.status(404).json({
-          message: 'The project with the specified ID does not exist.'
+          message: 'There is no project with the specified ID.'
         });
       }
     } catch (err) {
       res.status(500).json({
-        error: 'There was an error while updating the project.'
+        error: `There was an error while updating the project. ${err}`
       });
     }
   }
@@ -81,12 +81,12 @@ router.delete('/:id', async (req, res) => {
       });
     } else {
       res.status(404).json({
-        error: `The project with the specified ID does not exist. Number of projects deleted: ${numOfRemovedProjects}.`
+        error: `There is no project with the specified ID. Number of projects deleted: ${numOfRemovedProjects}.`
       });
     }
   } catch (err) {
     res.status(500).json({
-      error: 'There was an error while deleting the project.'
+      error: `There was an error while deleting the project. ${err}`
     });
   }
 });
@@ -101,12 +101,12 @@ router.get('/:id/actions', async (req, res) => {
       res.status(200).json(projectActions);
     } catch (err) {
       res.status(500).json({
-        error: "There was an error while retrieving the project's actions."
+        error: `There was an error while retrieving the project's actions. ${err}`
       });
     }
   } else {
     res.status(404).json({
-      error: 'The project with the specified ID does not exist.'
+      error: 'There is no project with the specified ID.'
     });
   }
 });
