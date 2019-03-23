@@ -36,7 +36,7 @@ router.post('/', async (req, res) => {
   try {
     project = await projectModel.get(project_id);
     if (!project) {
-      res.status(404).json({
+      res.status(400).json({
         error: 'There is no project with the specified ID.'
       });
     }
