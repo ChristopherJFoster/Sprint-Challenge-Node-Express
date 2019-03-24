@@ -67,9 +67,9 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-  const { project_id, description, notes } = req.body;
+  const { project_id, description, notes, completed } = req.body;
   // Make the first submission check before making a server call:
-  if (!project_id && !description && !notes) {
+  if (!project_id && !description && !notes && !completed) {
     res.status(400).json({
       error: 'Please provide the action changes you intend to make.'
     });
