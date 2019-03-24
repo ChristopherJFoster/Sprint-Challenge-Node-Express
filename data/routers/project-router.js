@@ -73,38 +73,44 @@ router.put('/:id', async (req, res) => {
 });
 
 router.delete('/:id', async (req, res) => {
-  const project = await projectModel.get(req.params.id);
-  if (project) {
-    try {
-      const projectActions = await projectModel.getProjectActions(
-        req.params.id
-      );
-      if (projectActions) {
-        return res.status(400).json({
-          error:
-            "You must delete all a project's actions before deleting the project."
+  try {
+    const project = await projectModel.get(req.params.id);
+    if (project) {
+      try {
+        const projectActions = await projectModel.getProjectActions(
+          req.params.id
+        );
+        if (projectActions.length > 0) {
+          return res.status(400).json({
+            error:
+              "You must delete all a project's actions before deleting the project."
+          });
+        }
+      } catch (err) {
+        return res.status(500).json({
+          error: `There was an error while checking the project's actions. ${err}`
         });
       }
-    } catch (err) {
-      return res.status(500).json({
-        error: `There was an error while checking the project's actions. ${err}`
-      });
-    }
-    try {
-      const numOfDeletedProjects = await projectModel.remove(req.params.id);
-      if (numOfDeletedProjects) {
-        res.status(200).json({
-          message: `Number of projects deleted: ${numOfDeletedProjects}.`
+      try {
+        const numOfDeletedProjects = await projectModel.remove(req.params.id);
+        if (numOfDeletedProjects) {
+          res.status(200).json({
+            message: `Number of projects deleted: ${numOfDeletedProjects}.`
+          });
+        }
+      } catch (err) {
+        res.status(500).json({
+          error: `There was an error while deleting the project. ${err}`
         });
       }
-    } catch (err) {
-      res.status(500).json({
-        error: `There was an error while deleting the project. ${err}`
+    } else {
+      res.status(404).json({
+        error: 'There is no project with the specified ID.'
       });
     }
-  } else {
-    res.status(404).json({
-      error: 'There is no project with the specified ID.'
+  } catch (err) {
+    return res.status(500).json({
+      error: `There was an error while checking the project ID. ${err}`
     });
   }
 });
