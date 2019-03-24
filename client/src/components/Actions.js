@@ -2,7 +2,7 @@ import React from 'react';
 
 import Action from './Action';
 
-const Actions = ({ actions }) => {
+const Actions = ({ actions, projects }) => {
   return (
     <div className='actions'>
       <h1>Actions</h1>
@@ -11,7 +11,10 @@ const Actions = ({ actions }) => {
           return (
             <Action
               key={action.id}
-              project_id={action.project_id}
+              project={
+                projects.filter(project => project.id === action.project_id)[0]
+                  .name
+              }
               description={action.description}
               notes={action.notes}
               completed={action.completed}

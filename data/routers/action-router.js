@@ -124,7 +124,7 @@ router.delete('/:id', async (req, res) => {
       });
     } else {
       res.status(404).json({
-        error: `There is no action with the specified ID. Number of actions deleted: ${numOfDeletedActions}.`
+        error: 'There is no action with the specified ID.'
       });
     }
   } catch (err) {

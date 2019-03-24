@@ -41,7 +41,7 @@ const App = () => {
   return (
     <div className='App'>
       <Projects projects={projects} />
-      <Actions actions={actions} />
+      <Actions actions={actions} projects={projects} />
     </div>
   );
 };
