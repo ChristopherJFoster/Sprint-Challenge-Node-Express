@@ -7,32 +7,38 @@ router.get('/', async (req, res) => {
     const projects = await projectModel.get();
     res.status(200).json(projects);
   } catch (err) {
-    res
-      .status(500)
-      .json({ error: 'The projects information could not be retrieved.' });
+    res.status(500).json({
+      error: `There was an error while retrieving the projects. ${err}`
+    });
   }
 });
 
 router.get('/:id', async (req, res) => {
   try {
     const project = await projectModel.get(req.params.id);
-    res.status(200).json(project);
+    if (project) {
+      res.status(200).json(project);
+    } else {
+      res.status(404).json({
+        error: 'There is no project with the specified ID.'
+      });
+    }
   } catch (err) {
-    res.status(404).json({
-      error:
-        'There is no project with that ID, or there was an error retrieving the project information.'
+    res.status(500).json({
+      error: `There was an error while retrieving the project. ${err}`
     });
   }
 });
 
 router.post('/', async (req, res) => {
-  if (req.body.name && req.body.description) {
+  const { name, description } = req.body;
+  if (name && description) {
     try {
       const addedProject = await projectModel.insert(req.body);
       res.status(201).json(addedProject);
     } catch (err) {
       res.status(500).json({
-        error: 'There was an error while saving the project to the database.'
+        error: `There was an error while saving the project. ${err}`
       });
     }
   } else {
@@ -43,29 +49,24 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-  if (!req.params.id || !req.body.changes) {
+  const { name, description, completed } = req.body;
+  if (!name && !description && !completed) {
     res.status(400).json({
-      error:
-        'Please provide the ID of the project you intend to update as well as your intended changes.'
+      error: 'Please provide the project changes you intend to make.'
     });
   } else {
     try {
-      const updatedProject = await projectModel.update(
-        req.params.id,
-        req.body.changes
-      );
+      const updatedProject = await projectModel.update(req.params.id, req.body);
       if (updatedProject) {
-        res
-          .status(200)
-          .json({ message: 'You successfully updated the project.' });
+        res.status(200).json(updatedProject);
       } else {
         res.status(404).json({
-          message: 'The project with the specified ID does not exist.'
+          message: 'There is no project with the specified ID.'
         });
       }
     } catch (err) {
       res.status(500).json({
-        error: 'There was an error while updating the project.'
+        error: `There was an error while updating the project. ${err}`
       });
     }
   }
@@ -73,39 +74,63 @@ router.put('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
   try {
-    const numOfRemovedProjects = await projectModel.remove(req.params.id);
-    if (numOfRemovedProjects) {
-      res.status(200).json({
-        message: `Number of projects deleted: ${numOfRemovedProjects}`
-      });
+    const project = await projectModel.get(req.params.id);
+    if (project) {
+      try {
+        const projectActions = await projectModel.getProjectActions(
+          req.params.id
+        );
+        if (projectActions.length > 0) {
+          return res.status(400).json({
+            error:
+              "You must delete all a project's actions before deleting the project."
+          });
+        }
+      } catch (err) {
+        return res.status(500).json({
+          error: `There was an error while checking the project's actions. ${err}`
+        });
+      }
+      try {
+        const numOfDeletedProjects = await projectModel.remove(req.params.id);
+        if (numOfDeletedProjects) {
+          res.status(200).json({
+            message: `Number of projects deleted: ${numOfDeletedProjects}.`
+          });
+        }
+      } catch (err) {
+        res.status(500).json({
+          error: `There was an error while deleting the project. ${err}`
+        });
+      }
     } else {
-      res
-        .status(404)
-        .json({ error: 'The project with the specified ID does not exist.' });
+      res.status(404).json({
+        error: 'There is no project with the specified ID.'
+      });
     }
   } catch (err) {
-    res.status(500).json({
-      error: 'There was an error while removing the project from the database.'
+    return res.status(500).json({
+      error: `There was an error while checking the project ID. ${err}`
     });
   }
 });
 
 router.get('/:id/actions', async (req, res) => {
-  try {
-    const projectActions = await projectModel.getProjectActions(req.params.id);
-    if (projectActions.length > 0) {
+  const project = await projectModel.get(req.params.id);
+  if (project) {
+    try {
+      const projectActions = await projectModel.getProjectActions(
+        req.params.id
+      );
       res.status(200).json(projectActions);
-    } else {
-      // Since we aren't supposed to edit the helpers (I assume), I think this is a good compromise for not knowing whether there is no project with the submitted ID, or whether project has no actions:
-      res.status(404).json({
-        projectActions: projectActions,
-        message:
-          'Either there is no project with that ID, or the project has no actions.'
+    } catch (err) {
+      res.status(500).json({
+        error: `There was an error while retrieving the project's actions. ${err}`
       });
     }
-  } catch (err) {
-    res.status(500).json({
-      error: "There was an error retrieving the project's actions."
+  } else {
+    res.status(404).json({
+      error: 'There is no project with the specified ID.'
     });
   }
 });
